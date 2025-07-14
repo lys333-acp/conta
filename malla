@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Curricular Interactiva - Contaduría Pública UC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* Un gris muy claro */
+        }
+        .subject-card {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+        }
+        .subject-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.08);
+        }
+        /* Rojo Cereza para la materia seleccionada */
+        .selected {
+            background-color: #990000 !important; 
+            color: white;
+            border-color: #7c0000;
+        }
+        /* Un rojo más claro o anaranjado para las prelaciones */
+        .prerequisite {
+            background-color: #E74C3C !important;
+            color: white;
+            border-color: #c0392b;
+        }
+        .semester-column {
+            scroll-snap-align: start;
+        }
+        .main-container {
+            scroll-snap-type: x mandatory;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold" style="color: #990000;">Malla Curricular Interactiva</h1>
+            <p class="text-lg md:text-xl text-gray-700 mt-2">Contaduría Pública - Universidad de Carabobo (FaCES)</p>
+            <p class="text-sm text-gray-500 mt-4">Haz clic en una materia para visualizar sus prelaciones.</p>
+        </header>
+
+        <div class="flex space-x-2 mb-6 p-4 bg-white rounded-lg shadow-sm justify-center items-center flex-wrap">
+            <div class="flex items-center mr-4 mb-2 md:mb-0">
+                <div class="w-6 h-6 rounded-full mr-2 border-2 border-white shadow" style="background-color: #990000;"></div>
+                <span>Seleccionada</span>
+            </div>
+            <div class="flex items-center mr-4 mb-2 md:mb-0">
+                <div class="w-6 h-6 rounded-full mr-2 border-2 border-white shadow" style="background-color: #E74C3C;"></div>
+                <span>Prelación</span>
+            </div>
+            <div class="flex items-center mb-2 md:mb-0">
+                <div class="w-6 h-6 rounded-full bg-gray-200 mr-2 border-2 border-white shadow"></div>
+                <span>Regular</span>
+            </div>
+        </div>
+
+        <div id="curriculum-grid" class="main-container flex pb-4 -mx-2">
+            <!-- Las columnas de los semestres se generarán aquí con JavaScript -->
+        </div>
+        
+        <footer class="text-center mt-8 text-sm text-gray-500">
+            <p>Esta es una representación visual no oficial basada en el boletín 2S-2025. Para información oficial, consulta directamente con la <a href="http://www.faces.uc.edu.ve/" target="_blank" class="hover:underline" style="color: #990000;">Facultad de Ciencias Económicas y Sociales</a> de la UC.</p>
+        </footer>
+    </div>
+
+    <script>
+        const curriculumData = [
+            { semester: 1, subjects: [
+                { id: 'CB-1102', name: 'Introducción a la Economía', uc: 3, prerequisites: [] },
+                { id: 'CS-1101', name: 'Historia Contemporánea', uc: 3, prerequisites: [] },
+                { id: 'CB-1104', name: 'Métodos de Investigación I', uc: 3, prerequisites: [] },
+                { id: 'CB-1103', name: 'Introducción a la Matemática', uc: 4, prerequisites: [] },
+                { id: 'AC-2201', name: 'Derecho Público', uc: 2, prerequisites: [] }
+            ]},
+            { semester: 2, subjects: [
+                { id: 'AC-2101', name: 'Fundamentos Económicos I', uc: 3, prerequisites: ['CB-1102'] },
+                { id: 'AC-4101', name: 'Contabilidad I', uc: 6, prerequisites: [] },
+                { id: 'AC-2503', name: 'Sociología de las Organizaciones', uc: 3, prerequisites: [] },
+                { id: 'CB-2102', name: 'Matemática I', uc: 4, prerequisites: ['CB-1103'] },
+                { id: 'AC-2203', name: 'Legislación Mercantil I', uc: 3, prerequisites: ['AC-2201'] }
+            ]},
+            { semester: 3, subjects: [
+                { id: 'AG-Z102', name: 'Fundamentos Económicos II', uc: 3, prerequisites: ['AC-2101'] },
+                { id: 'AC-4102', name: 'Contabilidad II', uc: 6, prerequisites: ['AC-4101'] },
+                { id: 'AC-5032', name: 'Introducción a la Teoría de la Organización', uc: 3, prerequisites: ['AC-2503'] },
+                { id: 'AC-1101', name: 'Matemática II', uc: 4, prerequisites: ['CB-2102'] },
+                { id: 'AG-2207', name: 'Legislación Laboral', uc: 2, prerequisites: ['AC-2203'] }
+            ]},
+            { semester: 4, subjects: [
+                { id: 'AC-2301', name: 'Recursos Económicos I', uc: 2, prerequisites: ['AG-Z102'] },
+                { id: 'AC-4103', name: 'Contabilidad III', uc: 6, prerequisites: ['AC-4102'] },
+                { id: 'AC-5107', name: 'Comportamiento Organizacional', uc: 3, prerequisites: ['AC-5032'] },
+                { id: 'AC-1204', name: 'Estadística I', uc: 3, prerequisites: ['AC-1101'] },
+                { id: 'AC-1102', name: 'Cálculo Financiero', uc: 3, prerequisites: ['AC-1101'] }
+            ]},
+            { semester: 5, subjects: [
+                { id: 'AC-2302', name: 'Recursos Económicos II', uc: 2, prerequisites: ['AC-2301'] },
+                { id: 'CP-4104', name: 'Contabilidad IV', uc: 6, prerequisites: ['AC-4103'] },
+                { id: 'CB-2101', name: 'Métodos de Investigación II', uc: 2, prerequisites: ['CB-1104'] },
+                { id: 'AC-1205', name: 'Estadística II', uc: 3, prerequisites: ['AC-1204'] },
+                { id: 'AC-5503', name: 'Administración Pública', uc: 3, prerequisites: ['AC-5032'] },
+                { id: 'CB-2007', name: 'Inducción al Servicio Comunitario', uc: 0, prerequisites: [] }
+            ]},
+            { semester: 6, subjects: [
+                { id: 'CP-4201', name: 'Contabilidad en Época de Inflación', uc: 3, prerequisites: ['CP-4104'] },
+                { id: 'CP-4301', name: 'Contabilidad Gubernamental', uc: 2, prerequisites: ['CP-4104'] },
+                { id: 'CP-4302', name: 'Contabilidad de Costos I', uc: 3, prerequisites: ['CP-4104'] },
+                { id: 'AC-1206', name: 'Estadística III', uc: 3, prerequisites: ['AC-1205'] },
+                { id: 'AC-3502', name: 'Principios de Computación', uc: 2, prerequisites: [] },
+                { id: 'AC-2007', name: 'Servicio Comunitario', uc: 0, prerequisites: ['CB-2007'] }
+            ]},
+            { semester: 7, subjects: [
+                { id: 'AG-2303', name: 'Instituciones Financieras', uc: 2, prerequisites: [] },
+                { id: 'CP-3101', name: 'Auditoría I', uc: 4, prerequisites: ['CP-4201'] },
+                { id: 'CP-4303', name: 'Contabilidad de Costos II', uc: 3, prerequisites: ['CP-4302'] },
+                { id: 'CP-3302', name: 'Sistemas y Procedimientos', uc: 2, prerequisites: ['AC-3502'] },
+                { id: 'AC-2208', name: 'Derecho Financiero y Tributario', uc: 3, prerequisites: ['AG-2207'] }
+            ]},
+            { semester: 8, subjects: [
+                { id: 'AC-2501', name: 'Probl. Socioeconómicos de Vzla y A.L.', uc: 3, prerequisites: [] },
+                { id: 'CP-3103', name: 'Auditoría II', uc: 4, prerequisites: ['CP-3101'] },
+                { id: 'CP-4304', name: 'Contabilidad de Costos III', uc: 3, prerequisites: ['CP-4303'] },
+                { id: 'CP-3303', name: 'Sistemas de Contabilidad', uc: 3, prerequisites: ['CP-3302'] },
+                { id: 'AC-5206', name: 'Impuestos I', uc: 3, prerequisites: ['AC-2208'] }
+            ]},
+            { semester: 9, subjects: [
+                { id: 'AC-2402', name: 'Investigación Aplicada a la Contaduría', uc: 3, prerequisites: ['CB-2101'] },
+                { id: 'CP-3104', name: 'Auditoría III', uc: 4, prerequisites: ['CP-3103'] },
+                { id: 'CP-3401', name: 'Análisis de Estados Financieros', uc: 3, prerequisites: ['CP-4201'] },
+                { id: 'AC-5302', name: 'Presupuesto de Empresas', uc: 3, prerequisites: ['CP-4304'] },
+                { id: 'AC-5207', name: 'Impuestos II', uc: 3, prerequisites: ['AC-5206'] }
+            ]},
+            { semester: 10, subjects: [
+                { id: 'CP-2403', name: 'Trabajo de Grado Contaduría', uc: 0, prerequisites: ['AC-2402'] },
+                { id: 'ELECTIVA-1', name: 'ELECTIVA', uc: 2, prerequisites: [] },
+                { id: 'CP-3102', name: 'Problemática de la Contaduría en Vzla', uc: 2, prerequisites: [] },
+                { id: 'ELECTIVA-2', name: 'ELECTIVA', uc: 2, prerequisites: [] }
+            ]}
+        ];
+
+        const gridContainer = document.getElementById('curriculum-grid');
+
+        // Función para renderizar la malla curricular
+        function renderGrid() {
+            gridContainer.innerHTML = ''; // Limpiar la malla anterior
+            curriculumData.forEach(semester => {
+                const semesterColumn = document.createElement('div');
+                semesterColumn.className = 'semester-column flex-shrink-0 w-64 md:w-72 p-2';
+                
+                const semesterHeader = document.createElement('h3');
+                semesterHeader.className = 'text-xl font-semibold text-center mb-4 pb-2 border-b-2';
+                semesterHeader.textContent = `Semestre ${semester.semester}`;
+                semesterHeader.style.borderColor = '#d1d5db';
+                semesterHeader.style.color = '#990000';
+                semesterColumn.appendChild(semesterHeader);
+
+                const subjectsList = document.createElement('div');
+                subjectsList.className = 'space-y-2';
+                semesterColumn.appendChild(subjectsList);
+
+                semester.subjects.forEach(subject => {
+                    const subjectCard = document.createElement('div');
+                    subjectCard.className = 'subject-card p-3 rounded-lg shadow-sm';
+                    subjectCard.dataset.id = subject.id;
+                    subjectCard.dataset.prerequisites = JSON.stringify(subject.prerequisites);
+                    
+                    const subjectName = document.createElement('p');
+                    subjectName.className = 'font-semibold text-sm leading-tight';
+                    subjectName.textContent = subject.name;
+
+                    const subjectInfo = document.createElement('p');
+                    subjectInfo.className = 'text-xs text-gray-500 mt-1';
+                    subjectInfo.textContent = `UC: ${subject.uc} | Código: ${subject.id}`;
+                    
+                    subjectCard.appendChild(subjectName);
+                    subjectCard.appendChild(subjectInfo);
+
+                    subjectCard.addEventListener('click', () => handleSubjectClick(subject.id));
+                    subjectsList.appendChild(subjectCard);
+                });
+
+                gridContainer.appendChild(semesterColumn);
+            });
+        }
+
+        // Función para manejar el clic en una materia
+        function handleSubjectClick(subjectId) {
+            // Limpiar todas las selecciones existentes
+            document.querySelectorAll('.subject-card').forEach(card => {
+                card.classList.remove('selected', 'prerequisite');
+            });
+
+            const selectedCard = document.querySelector(`.subject-card[data-id='${subjectId}']`);
+            if (!selectedCard) return;
+
+            // Resaltar la tarjeta seleccionada
+            selectedCard.classList.add('selected');
+
+            // Obtener y resaltar las prelaciones
+            const prerequisites = JSON.parse(selectedCard.dataset.prerequisites);
+            prerequisites.forEach(prereqId => {
+                const prereqCard = document.querySelector(`.subject-card[data-id='${prereqId}']`);
+                if (prereqCard) {
+                    prereqCard.classList.add('prerequisite');
+                }
+            });
+        }
+
+        // Renderizado inicial
+        document.addEventListener('DOMContentLoaded', renderGrid);
+    </script>
+
+</body>
+</html>
